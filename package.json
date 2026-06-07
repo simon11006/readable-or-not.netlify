@@ -1,0 +1,6 @@
+{
+  "name": "handwrite-trainer-html",
+  "version": "1.0.0",
+  "description": "이게 글씨냐!!! — AI 손글씨 트레이너 (HTML + Netlify Functions)",
+  "private": true
+}

@@ -1,0 +1,11 @@
+# Netlify 배포 설정 — 순수 HTML 사이트 + Functions
+
+[build]
+  publish = "."                       # 현재 폴더의 HTML 파일을 그대로 게시
+  functions = "netlify/functions"     # 함수 폴더 위치
+
+# /api/analyze 로 들어온 요청을 analyze 함수로 연결
+[[redirects]]
+  from = "/api/analyze"
+  to = "/.netlify/functions/analyze"
+  status = 200

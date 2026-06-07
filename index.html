@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>이게 글씨냐!!! — AI 손글씨 트레이너</title>
+  <meta name="description" content="AI도 못 읽으면 진짜 문제 있다. 손글씨를 사진 찍어 AI에게 채점받아보세요." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Poor+Story&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="container">
+
+    <!-- 공통 상단바 -->
+    <nav class="nav">
+      <span class="logo">🔥 AI 손글씨 트레이너</span>
+      <button id="btn-history" class="link-btn">내 기록</button>
+    </nav>
+
+    <!-- ════════ 홈 화면 ════════ -->
+    <section id="view-home" class="view">
+      <header class="hero">
+        <div>
+          <h1 class="hero-title">이게 글씨냐!!!</h1>
+          <p class="hero-sub">AI도 못 읽으면 진짜 문제 있다</p>
+        </div>
+        <button id="btn-start-hero" class="btn-primary btn-pill">도전 시작 →</button>
+      </header>
+
+      <!-- 타입 탭 -->
+      <div class="tabs">
+        <button class="tab tab-active" data-type="sentence">문장</button>
+        <button class="tab" data-type="paragraph">문단</button>
+      </div>
+
+      <!-- 난이도 + 추천 문장 -->
+      <div class="main-grid">
+        <div class="card level-card">
+          <p class="card-label">난이도</p>
+          <div class="levels">
+            <button class="level level-active" data-diff="easy">쉬움</button>
+            <button class="level" data-diff="medium">보통</button>
+            <button class="level" data-diff="hard">어려움</button>
+            <button class="level" data-diff="all">전체</button>
+          </div>
+        </div>
+
+        <div class="card picked-card">
+          <div class="picked-head">
+            <p class="card-label">오늘의 문장</p>
+            <button id="btn-shuffle" class="icon-btn" title="다른 문장">↻</button>
+          </div>
+          <div id="picked-text" class="picked-text"></div>
+          <button id="btn-start-card" class="btn-primary btn-block">이 문장으로 도전</button>
+        </div>
+      </div>
+
+      <!-- 직접 고르기 -->
+      <div class="card pick-wrap">
+        <button id="btn-toggle-list" class="pick-toggle">
+          <span>직접 고르기</span>
+          <span class="chevron">⌄</span>
+        </button>
+        <div id="pick-panel" class="pick-panel" hidden>
+          <div class="custom-box">
+            <textarea id="custom-input" rows="1" placeholder="직접 문장 입력"></textarea>
+            <button id="btn-custom" class="btn-soft">이 내용으로 시작</button>
+          </div>
+          <div id="pick-list" class="pick-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════ 연습 화면 ════════ -->
+    <section id="view-practice" class="view" hidden>
+      <nav class="sub-nav">
+        <button id="btn-back-home" class="link-btn">← 뒤로</button>
+        <span class="sub-logo">🔥 이게 글씨냐!</span>
+        <button id="btn-print" class="btn-dark-sm">종이에 출력하기</button>
+      </nav>
+
+      <div class="practice-body">
+        <div class="practice-title">
+          <p id="practice-kind" class="card-label">문장 도전</p>
+          <h2>따라 써보세요</h2>
+        </div>
+
+        <div class="card">
+          <div id="practice-sentence" class="practice-sentence"></div>
+        </div>
+        <p id="practice-hint" class="center-hint"></p>
+
+        <div class="divider"><span>사진 업로드</span></div>
+
+        <!-- 촬영/업로드 -->
+        <div id="capture-idle" class="capture">
+          <div class="dropzone">
+            <div class="dropzone-icon">📷</div>
+            <p>손글씨 사진을 찍거나 업로드하세요</p>
+          </div>
+          <div class="btn-row">
+            <button id="btn-camera" class="btn-dark btn-half">카메라</button>
+            <button id="btn-upload" class="btn-outline btn-half">업로드</button>
+          </div>
+          <p class="center-hint small">밝은 곳에서 종이가 잘 보이도록 찍어주세요</p>
+        </div>
+
+        <div id="capture-camera" class="capture" hidden>
+          <video id="camera-video" class="camera-view" autoplay playsinline muted></video>
+          <canvas id="camera-canvas" hidden></canvas>
+          <div class="btn-row">
+            <button id="btn-camera-cancel" class="btn-outline btn-half">취소</button>
+            <button id="btn-take" class="btn-dark btn-half">촬영</button>
+          </div>
+        </div>
+
+        <div id="capture-preview" class="capture" hidden>
+          <img id="preview-img" class="preview-img" alt="촬영된 손글씨" />
+          <div class="btn-row">
+            <button id="btn-retake" class="btn-outline btn-half">다시 찍기</button>
+            <button id="btn-analyze" class="btn-primary btn-half">분석하기</button>
+          </div>
+        </div>
+
+        <div id="analyze-loading" class="loading" hidden>
+          <div class="spinner"></div>
+          <p>AI가 분석하고 있어요...</p>
+        </div>
+
+        <input id="file-input" type="file" accept="image/*" hidden />
+        <p id="practice-error" class="error-box" hidden></p>
+      </div>
+    </section>
+
+    <!-- ════════ 결과 화면 ════════ -->
+    <section id="view-result" class="view" hidden>
+      <nav class="sub-nav">
+        <span class="sub-logo">🔥 이게 글씨냐!</span>
+        <button id="btn-result-home" class="link-btn">홈으로</button>
+      </nav>
+
+      <div class="result-body">
+        <div class="card score-card">
+          <div id="result-emoji" class="result-emoji">🏆</div>
+          <div class="score-num"><span id="result-score">0</span><small>점</small></div>
+          <p id="result-message" class="score-msg"></p>
+          <div class="bar"><div id="result-bar" class="bar-fill"></div></div>
+          <div class="score-counts">
+            <span>맞은 글자 <b id="result-correct">0</b></span>
+            <span>틀린 글자 <b id="result-wrong">0</b></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="card-label">글자별 채점</p>
+          <div id="result-chars" class="chars"></div>
+        </div>
+
+        <div class="btn-row">
+          <button id="btn-result-home" class="btn-outline btn-half">홈으로</button>
+          <button id="btn-result-retry" class="btn-primary btn-half">다시 도전</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════ 기록 화면 ════════ -->
+    <section id="view-history" class="view" hidden>
+      <nav class="sub-nav">
+        <span class="sub-logo">🔥 이게 글씨냐!</span>
+        <button id="btn-history-home" class="link-btn">홈으로</button>
+      </nav>
+
+      <div class="history-body">
+        <h2 class="page-title">내 기록</h2>
+        <div id="history-empty" class="empty" hidden>
+          <p class="empty-big">아직 기록이 없어요</p>
+          <p class="empty-sub">첫 번째 도전을 시작해보세요</p>
+        </div>
+        <div id="history-list" class="history-list"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
