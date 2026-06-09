@@ -337,8 +337,80 @@ body {
 
 /* ───────── 작은 화면 대응 ───────── */
 @media (max-width: 560px) {
-  .main-grid { grid-template-columns: 1fr; }
-  .hero-title { font-size: 44px; }
+  .container { padding: 0 16px 36px; }
+  .nav { padding: 14px 0; }
+  .logo { font-size: 18px; }
+  .link-btn { font-size: 16px; }
+  .hero {
+    display: block;
+    padding: 22px 0 16px;
+  }
+  .hero-title {
+    font-size: 38px;
+    -webkit-text-stroke: 1px var(--text);
+  }
+  .hero-sub {
+    font-size: 16px;
+    margin-top: 4px;
+  }
+  .btn-pill {
+    width: 100%;
+    margin-top: 14px;
+    padding: 13px 20px;
+    text-align: center;
+  }
+  .tabs {
+    margin-bottom: 12px;
+    padding: 6px;
+  }
+  .tab {
+    font-size: 16px;
+    padding: 9px 4px;
+  }
+  .main-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .picked-card {
+    order: 1;
+    gap: 12px;
+    padding: 18px;
+  }
+  .level-card {
+    order: 2;
+    padding: 16px;
+  }
+  .levels {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .level {
+    font-size: 14px;
+    padding: 10px 4px;
+    border-radius: 10px;
+  }
+  .card-label {
+    font-size: 13px;
+    letter-spacing: .04em;
+  }
+  .picked-text {
+    font-size: 30px;
+    min-height: 54px;
+    padding: 6px 0;
+    letter-spacing: .04em;
+  }
+  .picked-text.picked-paragraph {
+    font-size: 17px;
+  }
+  .btn-block {
+    padding: 14px;
+    font-size: 16px;
+  }
+  .pick-toggle { padding: 14px 16px; }
   .read-panel h2 { font-size: 24px; }
   .recognized-text { font-size: 23px; }
 }
