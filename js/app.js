@@ -214,11 +214,9 @@ function renderResult(text, recognizedText) {
   const chips = document.getElementById('result-chars');
   chips.innerHTML = results.map((r) => {
     if (r.original === ' ') return '<span class="chip-space"></span>';
-    if (r.isCorrect) {
-      return `<span class="chip chip-ok">${escapeHtml(r.original)}</span>`;
-    }
+    const cls = r.isCorrect ? 'chip chip-ok' : 'chip chip-no';
     return `
-      <span class="chip chip-no">
+      <span class="${cls}">
         <span class="chip-original">${escapeHtml(r.original)}</span>
         <span class="chip-recognized">${escapeHtml(r.recognized || '?')}</span>
       </span>`;
