@@ -162,7 +162,7 @@ function startPractice(text) {
   const isPara = text.includes('\n');
 
   document.getElementById('practice-kind').textContent = isPara ? '문단 도전' : '문장 도전';
-  document.getElementById('practice-title-text').textContent = '따라 써보세요';
+  document.getElementById('practice-title-text').textContent = '종이에 따라 써보세요';
   document.getElementById('btn-print').hidden = false;
   const display = document.getElementById('practice-sentence');
   display.classList.toggle('para', isPara);
