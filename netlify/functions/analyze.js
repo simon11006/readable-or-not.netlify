@@ -4,7 +4,7 @@
 const GEMINI_URL =
   'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
-const BASE_PROMPT = `이 이미지에 손으로 쓴 글씨가 있습니다.
+const PROMPT = `이 이미지에 손으로 쓴 글씨가 있습니다.
 이미지에 보이는 글자를 일관된 기준으로 정확하게 읽어주세요.
 
 중요한 규칙:
@@ -20,22 +20,6 @@ const BASE_PROMPT = `이 이미지에 손으로 쓴 글씨가 있습니다.
   "confidence": "high 또는 medium 또는 low",
   "unclear_parts": ["불명확하거나 읽기 어려웠던 부분 설명"]
 }`;
-
-function buildPrompt(targetSentence) {
-  if (!targetSentence) return BASE_PROMPT;
-
-  return `${BASE_PROMPT}
-
-이 사진은 아래 제시문을 손으로 따라 쓴 것입니다.
-제시문:
-${targetSentence}
-
-제시문 사용 규칙:
-- 제시문을 그대로 복사하지 말고, 반드시 이미지에 실제로 보이는 글씨를 읽으세요
-- 다만 이미지의 글자가 애매하고 제시문의 같은 위치 글자와 모양이 비슷하면 그 글자로 일관되게 판독하세요
-- 제시문과 명백히 다르게 보이면 이미지에 보이는 글자를 우선하세요
-- 보이지 않거나 판독이 불가능한 글자는 제시문으로 채우지 말고 '?' 로 표시하세요`;
-}
 
 exports.handler = async (event) => {
   // POST 요청만 허용
@@ -55,7 +39,7 @@ exports.handler = async (event) => {
     return json(400, { error: '요청 형식이 올바르지 않습니다.' });
   }
 
-  const { imageBase64, mimeType, targetSentence } = body;
+  const { imageBase64, mimeType } = body;
   if (!imageBase64) {
     return json(400, { error: '이미지가 필요합니다.' });
   }
@@ -68,7 +52,7 @@ exports.handler = async (event) => {
         contents: [
           {
             parts: [
-              { text: buildPrompt(targetSentence) },
+              { text: PROMPT },
               { inline_data: { mime_type: mimeType || 'image/jpeg', data: imageBase64 } },
             ],
           },

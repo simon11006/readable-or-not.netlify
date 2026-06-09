@@ -432,7 +432,6 @@ async function analyze() {
       body: JSON.stringify({
         imageBase64: state.imageBase64,
         mimeType: state.mimeType,
-        targetSentence: state.currentText || undefined,
       }),
     });
     const data = await res.json();
