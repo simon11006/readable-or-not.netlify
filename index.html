@@ -91,7 +91,7 @@
       <div class="practice-body">
         <div class="practice-title">
           <p id="practice-kind" class="card-label">문장 도전</p>
-          <h2>따라 써보세요</h2>
+          <h2 id="practice-title-text">따라 써보세요</h2>
         </div>
 
         <div class="card practice-card">
@@ -117,6 +117,10 @@
 
         <div id="capture-preview" class="capture" hidden>
           <img id="preview-img" class="preview-img" alt="촬영된 손글씨" />
+          <div class="rotate-row">
+            <button id="btn-rotate-left" class="btn-outline rotate-btn">왼쪽 회전</button>
+            <button id="btn-rotate-right" class="btn-outline rotate-btn">오른쪽 회전</button>
+          </div>
           <div class="btn-row">
             <button id="btn-retake" class="btn-outline btn-half">다시 찍기</button>
             <button id="btn-analyze" class="btn-primary btn-half">분석하기</button>

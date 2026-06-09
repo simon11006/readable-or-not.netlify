@@ -162,13 +162,14 @@ function startPractice(text) {
   const isPara = text.includes('\n');
 
   document.getElementById('practice-kind').textContent = isPara ? '문단 도전' : '문장 도전';
+  document.getElementById('practice-title-text').textContent = '따라 써보세요';
   document.getElementById('btn-print').hidden = false;
   const display = document.getElementById('practice-sentence');
   display.classList.toggle('para', isPara);
   display.innerHTML = text.split('\n')
     .map((line) => `<p>${escapeHtml(line)}</p>`).join('');
-  document.getElementById('practice-hint').textContent =
-    isPara ? '위 문단을 종이에 또박또박 써주세요' : '위 문장을 종이에 크게 또박또박 써주세요';
+  document.getElementById('practice-hint').textContent = '';
+  document.getElementById('practice-hint').hidden = true;
   document.getElementById('capture-title').textContent = '사진 업로드';
 
   resetCapture();
@@ -180,12 +181,13 @@ function startReadCheck() {
   state.imageBase64 = null;
 
   document.getElementById('practice-kind').textContent = 'AI 판독';
+  document.getElementById('practice-title-text').textContent = '사진을 올려주세요';
   document.getElementById('btn-print').hidden = true;
   const display = document.getElementById('practice-sentence');
   display.classList.remove('para');
   display.innerHTML = '<p>자유롭게 쓴 손글씨를 찍어주세요</p>';
-  document.getElementById('practice-hint').textContent =
-    'AI가 사진 속 글씨를 어떻게 읽는지 그대로 확인합니다';
+  document.getElementById('practice-hint').textContent = '';
+  document.getElementById('practice-hint').hidden = true;
   document.getElementById('capture-title').textContent = '판독할 사진';
 
   resetCapture();
@@ -281,6 +283,10 @@ function startCamera() {
 
 function handleFile(file) {
   if (!file) return;
+  if (file.type && !file.type.startsWith('image/')) {
+    showError('이미지 파일만 업로드할 수 있습니다.');
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (e) => showPreview(e.target.result, file.type || 'image/jpeg');
   reader.readAsDataURL(file);
@@ -308,6 +314,27 @@ function showPreview(dataUrl, mimeType) {
   document.getElementById('preview-img').src = dataUrl;
   document.getElementById('capture-idle').hidden = true;
   document.getElementById('capture-preview').hidden = false;
+}
+
+function rotatePreview(degrees) {
+  if (!state.imageBase64) return;
+
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const quarterTurn = Math.abs(degrees) % 180 === 90;
+    canvas.width = quarterTurn ? img.naturalHeight : img.naturalWidth;
+    canvas.height = quarterTurn ? img.naturalWidth : img.naturalHeight;
+
+    const ctx = canvas.getContext('2d');
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((degrees * Math.PI) / 180);
+    ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+
+    const outputMime = state.mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
+    showPreview(canvas.toDataURL(outputMime, 0.92), outputMime);
+  };
+  img.src = document.getElementById('preview-img').src;
 }
 
 // ───── 분석 요청 ─────
@@ -421,6 +448,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('dropzone').addEventListener('drop', handleDropzoneDrop);
   document.getElementById('camera-input').addEventListener('change', (e) => handleFile(e.target.files[0]));
   document.getElementById('file-input').addEventListener('change', (e) => handleFile(e.target.files[0]));
+  document.getElementById('btn-rotate-left').addEventListener('click', () => rotatePreview(-90));
+  document.getElementById('btn-rotate-right').addEventListener('click', () => rotatePreview(90));
   document.getElementById('btn-retake').addEventListener('click', resetCapture);
   document.getElementById('btn-analyze').addEventListener('click', analyze);
 
