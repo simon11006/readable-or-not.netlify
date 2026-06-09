@@ -286,6 +286,22 @@ function handleFile(file) {
   reader.readAsDataURL(file);
 }
 
+function handleDropzoneDrag(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.add('dropzone-active');
+}
+
+function handleDropzoneLeave(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('dropzone-active');
+}
+
+function handleDropzoneDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('dropzone-active');
+  handleFile(e.dataTransfer?.files?.[0]);
+}
+
 function showPreview(dataUrl, mimeType) {
   state.imageBase64 = dataUrl.split(',')[1];
   state.mimeType = mimeType;
@@ -392,6 +408,17 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('btn-camera').addEventListener('click', startCamera);
   document.getElementById('btn-upload').addEventListener('click', () => document.getElementById('file-input').click());
+  document.getElementById('dropzone').addEventListener('click', () => document.getElementById('file-input').click());
+  document.getElementById('dropzone').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      document.getElementById('file-input').click();
+    }
+  });
+  document.getElementById('dropzone').addEventListener('dragover', handleDropzoneDrag);
+  document.getElementById('dropzone').addEventListener('dragenter', handleDropzoneDrag);
+  document.getElementById('dropzone').addEventListener('dragleave', handleDropzoneLeave);
+  document.getElementById('dropzone').addEventListener('drop', handleDropzoneDrop);
   document.getElementById('camera-input').addEventListener('change', (e) => handleFile(e.target.files[0]));
   document.getElementById('file-input').addEventListener('change', (e) => handleFile(e.target.files[0]));
   document.getElementById('btn-retake').addEventListener('click', resetCapture);

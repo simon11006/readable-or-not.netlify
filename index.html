@@ -94,7 +94,7 @@
           <h2>따라 써보세요</h2>
         </div>
 
-        <div class="card">
+        <div class="card practice-card">
           <div id="practice-sentence" class="practice-sentence"></div>
         </div>
         <p id="practice-hint" class="center-hint"></p>
@@ -103,15 +103,16 @@
 
         <!-- 촬영/업로드 -->
         <div id="capture-idle" class="capture">
-          <div class="dropzone">
+          <div id="dropzone" class="dropzone" role="button" tabindex="0">
             <div class="dropzone-icon">📷</div>
-            <p>손글씨 사진을 찍거나 업로드하세요</p>
+            <p>사진을 올려주세요</p>
+            <span class="dropzone-hint">클릭하거나 이미지를 끌어놓을 수 있어요</span>
           </div>
           <div class="btn-row">
             <button id="btn-camera" class="btn-dark btn-half">카메라</button>
             <button id="btn-upload" class="btn-outline btn-half">업로드</button>
           </div>
-          <p class="center-hint small">스마트폰에서는 기기 카메라 앱이 열립니다</p>
+          <p class="center-hint small">스마트폰·태블릿에서는 기기 카메라 앱이 열립니다</p>
         </div>
 
         <div id="capture-preview" class="capture" hidden>

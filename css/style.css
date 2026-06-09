@@ -213,13 +213,14 @@ body {
 .list-diff { font-size: 12px; color: var(--sub); flex-shrink: 0; }
 
 /* ───────── 연습 화면 ───────── */
-.practice-body { padding: 40px 0; display: flex; flex-direction: column; gap: 32px; }
+.practice-body { padding: 28px 0; display: flex; flex-direction: column; gap: 18px; }
 .practice-title { text-align: center; }
-.practice-title h2 { font-size: 30px; font-weight: 700; margin-top: 4px; }
+.practice-title h2 { font-size: 28px; font-weight: 700; margin-top: 2px; }
+.practice-card { padding: 20px 24px; }
 .practice-sentence { text-align: center; }
-.practice-sentence p { font-size: 32px; font-weight: 700; letter-spacing: .06em; padding: 8px 0; }
+.practice-sentence p { font-size: 28px; font-weight: 700; letter-spacing: .04em; padding: 4px 0; }
 .practice-sentence.para { text-align: left; }
-.practice-sentence.para p { font-size: 24px; letter-spacing: .03em; }
+.practice-sentence.para p { font-size: 21px; letter-spacing: .02em; }
 .center-hint { text-align: center; color: var(--sub); font-size: 16px; font-weight: 500; }
 .center-hint.small { font-size: 15px; }
 
@@ -231,10 +232,19 @@ body {
 .capture { display: flex; flex-direction: column; gap: 16px; }
 .dropzone {
   border: 2px dashed var(--border); border-radius: var(--radius);
-  background: #fff; padding: 40px; text-align: center; color: var(--sub);
+  background: #fff; padding: 22px; text-align: center; color: var(--sub);
+  cursor: pointer; transition: border-color .15s, background .15s, color .15s;
 }
-.dropzone-icon { font-size: 40px; margin-bottom: 8px; }
-.preview-img { width: 100%; max-height: 300px; object-fit: contain; border-radius: var(--radius); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.dropzone:hover,
+.dropzone-active {
+  border-color: var(--accent);
+  background: #f8fbff;
+  color: var(--text);
+}
+.dropzone-icon { font-size: 30px; margin-bottom: 4px; }
+.dropzone p { font-size: 16px; font-weight: 600; }
+.dropzone-hint { display: block; margin-top: 4px; font-size: 13px; color: var(--sub); }
+.preview-img { width: 100%; max-height: 260px; object-fit: contain; border-radius: var(--radius); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
 
 .loading { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px; color: var(--sub); }
 .spinner {
@@ -338,6 +348,26 @@ body {
 .sc-mid { color: var(--accent); }
 .sc-low { color: #ef4444; }
 
+/* ───────── 태블릿 대응 ───────── */
+@media (max-width: 900px) {
+  .sub-nav { padding: 16px 0; }
+  .practice-body {
+    padding: 22px 0;
+    gap: 16px;
+  }
+  .practice-title h2 { font-size: 26px; }
+  .practice-card { padding: 18px 20px; }
+  .practice-sentence p {
+    font-size: 26px;
+    padding: 2px 0;
+  }
+  .practice-sentence.para p { font-size: 19px; }
+  .dropzone {
+    padding: 18px;
+  }
+  .dropzone-icon { font-size: 28px; }
+}
+
 /* ───────── 작은 화면 대응 ───────── */
 @media (max-width: 560px) {
   .container { padding: 0 16px 36px; }
@@ -409,6 +439,79 @@ body {
     font-size: 16px;
   }
   .pick-toggle { padding: 14px 16px; }
+  .sub-nav {
+    padding: 12px 0;
+    gap: 10px;
+  }
+  .sub-logo { font-size: 17px; }
+  .btn-dark-sm {
+    padding: 7px 10px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+  .practice-body {
+    padding: 16px 0;
+    gap: 12px;
+  }
+  .practice-title h2 {
+    font-size: 23px;
+    margin-top: 0;
+  }
+  .practice-card {
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+  .practice-sentence p {
+    font-size: 23px;
+    letter-spacing: .02em;
+    padding: 2px 0;
+  }
+  .practice-sentence.para p {
+    font-size: 16px;
+    line-height: 1.45;
+  }
+  .center-hint {
+    font-size: 14px;
+  }
+  .divider {
+    gap: 10px;
+  }
+  .divider span {
+    font-size: 13px;
+  }
+  .capture {
+    gap: 10px;
+  }
+  .dropzone {
+    padding: 12px;
+    border-radius: 14px;
+  }
+  .dropzone-icon {
+    font-size: 22px;
+    margin-bottom: 2px;
+  }
+  .dropzone p {
+    font-size: 14px;
+  }
+  .dropzone-hint {
+    display: none;
+  }
+  .capture .btn-row {
+    gap: 8px;
+  }
+  .capture .btn-dark,
+  .capture .btn-outline,
+  .capture .btn-primary {
+    padding: 11px;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+  .center-hint.small {
+    font-size: 13px;
+  }
+  .preview-img {
+    max-height: 220px;
+  }
   .read-panel h2 { font-size: 24px; }
   .recognized-text { font-size: 23px; }
 }
