@@ -256,10 +256,11 @@ body {
 .rotate-row {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 .rotate-btn {
-  flex: 0 1 150px;
+  flex: 0 1 132px;
   padding: 9px 12px;
   border-radius: 12px;
   font-size: 14px;
@@ -395,10 +396,6 @@ body {
   .link-btn { font-size: 16px; }
   .hero {
     padding: 18px 0 14px;
-  }
-  .hero-title {
-    font-size: 36px;
-    -webkit-text-stroke: 1px var(--text);
   }
   .hero-sub {
     font-size: 16px;
@@ -539,9 +536,44 @@ body {
     gap: 8px;
   }
   .rotate-btn {
-    flex: 1;
+    flex: 1 1 30%;
     padding: 10px 8px;
+    font-size: 12px;
+  }
+  .result-body {
+    padding: 16px 0;
+    gap: 12px;
+  }
+  .result-body .card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+  .score-card {
+    gap: 8px;
+  }
+  .result-emoji {
+    font-size: 30px;
+  }
+  .score-num {
+    font-size: 46px;
+  }
+  .score-num small {
+    font-size: 18px;
+  }
+  .score-msg {
+    font-size: 14px;
+    line-height: 1.35;
+  }
+  .bar {
+    height: 8px;
+  }
+  .score-counts {
+    gap: 16px;
     font-size: 13px;
+  }
+  .chars {
+    gap: 5px;
+    margin-top: 12px;
   }
   .read-panel h2 { font-size: 24px; }
   .recognized-text { font-size: 23px; }

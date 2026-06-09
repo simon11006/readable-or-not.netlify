@@ -397,6 +397,26 @@ function rotatePreview(degrees) {
   img.src = document.getElementById('preview-img').src;
 }
 
+function flipPreviewHorizontal() {
+  if (!state.imageBase64) return;
+
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+
+    const ctx = canvas.getContext('2d');
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(img, 0, 0);
+
+    const outputMime = state.mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
+    showPreview(canvas.toDataURL(outputMime, 0.92), outputMime);
+  };
+  img.src = document.getElementById('preview-img').src;
+}
+
 // ───── 분석 요청 ─────
 
 async function analyze() {
@@ -511,6 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-webcam-cancel').addEventListener('click', resetCapture);
   document.getElementById('btn-webcam-take').addEventListener('click', takeWebcamPhoto);
   document.getElementById('btn-rotate-left').addEventListener('click', () => rotatePreview(-90));
+  document.getElementById('btn-flip-horizontal').addEventListener('click', flipPreviewHorizontal);
   document.getElementById('btn-rotate-right').addEventListener('click', () => rotatePreview(90));
   document.getElementById('btn-retake').addEventListener('click', resetCapture);
   document.getElementById('btn-analyze').addEventListener('click', analyze);
