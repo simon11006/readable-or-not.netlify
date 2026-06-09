@@ -112,16 +112,7 @@
             <button id="btn-camera" class="btn-dark btn-half">카메라</button>
             <button id="btn-upload" class="btn-outline btn-half">업로드</button>
           </div>
-          <p class="center-hint small">밝은 곳에서 종이가 잘 보이도록 찍어주세요</p>
-        </div>
-
-        <div id="capture-camera" class="capture" hidden>
-          <video id="camera-video" class="camera-view" autoplay playsinline muted></video>
-          <canvas id="camera-canvas" hidden></canvas>
-          <div class="btn-row">
-            <button id="btn-camera-cancel" class="btn-outline btn-half">취소</button>
-            <button id="btn-take" class="btn-dark btn-half">촬영</button>
-          </div>
+          <p class="center-hint small">스마트폰에서는 기기 카메라 앱이 열립니다</p>
         </div>
 
         <div id="capture-preview" class="capture" hidden>
@@ -137,6 +128,7 @@
           <p>AI가 분석하고 있어요...</p>
         </div>
 
+        <input id="camera-input" type="file" accept="image/*" capture="environment" hidden />
         <input id="file-input" type="file" accept="image/*" hidden />
         <p id="practice-error" class="error-box" hidden></p>
       </div>

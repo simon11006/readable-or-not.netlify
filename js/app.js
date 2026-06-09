@@ -260,44 +260,18 @@ function renderHistory() {
 
 // ───── 카메라 / 업로드 ─────
 
-let stream = null;
-
 function resetCapture() {
-  stopCamera();
   state.imageBase64 = null;
   document.getElementById('capture-idle').hidden = false;
-  document.getElementById('capture-camera').hidden = true;
   document.getElementById('capture-preview').hidden = true;
   document.getElementById('analyze-loading').hidden = true;
   document.getElementById('practice-error').hidden = true;
+  document.getElementById('camera-input').value = '';
+  document.getElementById('file-input').value = '';
 }
 
-async function startCamera() {
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    document.getElementById('capture-idle').hidden = true;
-    document.getElementById('capture-camera').hidden = false;
-    const video = document.getElementById('camera-video');
-    video.srcObject = stream;
-    video.play();
-  } catch {
-    showError('카메라를 열 수 없습니다. 사진 업로드를 이용해주세요.');
-  }
-}
-
-function stopCamera() {
-  if (stream) { stream.getTracks().forEach((t) => t.stop()); stream = null; }
-}
-
-function takePhoto() {
-  const video = document.getElementById('camera-video');
-  const canvas = document.getElementById('camera-canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-  stopCamera();
-  showPreview(dataUrl, 'image/jpeg');
+function startCamera() {
+  document.getElementById('camera-input').click();
 }
 
 function handleFile(file) {
@@ -312,7 +286,6 @@ function showPreview(dataUrl, mimeType) {
   state.mimeType = mimeType;
   document.getElementById('preview-img').src = dataUrl;
   document.getElementById('capture-idle').hidden = true;
-  document.getElementById('capture-camera').hidden = true;
   document.getElementById('capture-preview').hidden = false;
 }
 
@@ -421,9 +394,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('btn-camera').addEventListener('click', startCamera);
   document.getElementById('btn-upload').addEventListener('click', () => document.getElementById('file-input').click());
+  document.getElementById('camera-input').addEventListener('change', (e) => handleFile(e.target.files[0]));
   document.getElementById('file-input').addEventListener('change', (e) => handleFile(e.target.files[0]));
-  document.getElementById('btn-take').addEventListener('click', takePhoto);
-  document.getElementById('btn-camera-cancel').addEventListener('click', resetCapture);
   document.getElementById('btn-retake').addEventListener('click', resetCapture);
   document.getElementById('btn-analyze').addEventListener('click', analyze);
 
