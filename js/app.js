@@ -117,7 +117,6 @@ function renderHome() {
   document.getElementById('challenge-panel').hidden = isReadMode;
   document.getElementById('read-panel').hidden = !isReadMode;
   document.getElementById('pick-wrap').hidden = isReadMode;
-  document.getElementById('btn-start-hero').textContent = isReadMode ? 'AI 판독 시작 →' : '도전 시작 →';
 
   if (isReadMode) return;
 
@@ -136,6 +135,8 @@ function renderPicked() {
   if (!state.picked) { box.textContent = '문장이 없습니다.'; return; }
   box.textContent = state.picked.text;
   box.classList.toggle('picked-paragraph', state.contentType === 'paragraph');
+  document.getElementById('btn-start-card').textContent =
+    state.contentType === 'paragraph' ? '이 문단으로 도전' : '이 문장으로 도전';
 }
 
 function shufflePicked() {
@@ -361,14 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   // 추천 셔플
   document.getElementById('btn-shuffle').addEventListener('click', shufflePicked);
-  // 도전 시작 (히어로 + 카드)
-  document.getElementById('btn-start-hero').addEventListener('click', () => {
-    if (state.contentType === 'read') {
-      startReadCheck();
-      return;
-    }
-    if (state.picked) startPractice(state.picked.text);
-  });
+  // 도전 시작
   document.getElementById('btn-start-card').addEventListener('click', () => state.picked && startPractice(state.picked.text));
   document.getElementById('btn-start-read').addEventListener('click', startReadCheck);
   // 직접 고르기 토글
