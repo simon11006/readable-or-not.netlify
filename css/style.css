@@ -264,7 +264,27 @@ body {
   font-size: 22px; font-weight: 700;
 }
 .chip-ok { background: var(--bg); color: var(--text); }
-.chip-no { background: #fef2f2; color: #ef4444; box-shadow: inset 0 0 0 1px #fecaca; }
+.chip-no {
+  min-width: 52px;
+  height: 56px;
+  flex-direction: column;
+  gap: 2px;
+  background: #fef2f2;
+  color: #ef4444;
+  box-shadow: inset 0 0 0 1px #fecaca;
+}
+.chip-original {
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1;
+}
+.chip-recognized {
+  width: 100%;
+  border-top: 1px solid #fecaca;
+  padding-top: 2px;
+  font-size: 16px;
+  line-height: 1;
+}
 .chip-space { width: 16px; }
 
 .read-result-card {

@@ -63,10 +63,10 @@ function compareTexts(original, recognized) {
   let idx = 0;
   for (const ch of origChars) {
     if (ch === ' ') {
-      results.push({ original: ' ', isCorrect: true });
+      results.push({ original: ' ', recognized: ' ', isCorrect: true });
     } else {
       const item = alignment[idx] || { orig: ch, recog: '?' };
-      results.push({ original: item.orig, isCorrect: item.orig === item.recog });
+      results.push({ original: item.orig, recognized: item.recog, isCorrect: item.orig === item.recog });
       idx++;
     }
   }
@@ -214,8 +214,14 @@ function renderResult(text, recognizedText) {
   const chips = document.getElementById('result-chars');
   chips.innerHTML = results.map((r) => {
     if (r.original === ' ') return '<span class="chip-space"></span>';
-    const cls = r.isCorrect ? 'chip chip-ok' : 'chip chip-no';
-    return `<span class="${cls}">${escapeHtml(r.original)}</span>`;
+    if (r.isCorrect) {
+      return `<span class="chip chip-ok">${escapeHtml(r.original)}</span>`;
+    }
+    return `
+      <span class="chip chip-no">
+        <span class="chip-original">${escapeHtml(r.original)}</span>
+        <span class="chip-recognized">${escapeHtml(r.recognized || '?')}</span>
+      </span>`;
   }).join('');
 
   showView('result');
