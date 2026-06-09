@@ -115,6 +115,15 @@
           <p class="center-hint small">스마트폰·태블릿에서는 기기 카메라 앱이 열립니다</p>
         </div>
 
+        <div id="capture-webcam" class="capture" hidden>
+          <video id="webcam-video" class="webcam-view" autoplay playsinline muted></video>
+          <canvas id="webcam-canvas" hidden></canvas>
+          <div class="btn-row">
+            <button id="btn-webcam-cancel" class="btn-outline btn-half">취소</button>
+            <button id="btn-webcam-take" class="btn-dark btn-half">촬영</button>
+          </div>
+        </div>
+
         <div id="capture-preview" class="capture" hidden>
           <img id="preview-img" class="preview-img" alt="촬영된 손글씨" />
           <div class="rotate-row">
