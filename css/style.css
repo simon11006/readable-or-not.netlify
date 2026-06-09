@@ -1,5 +1,6 @@
 /* ───────── 기본 설정 ───────── */
 * { margin: 0; padding: 0; box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 :root {
   --bg: #f5f5f7;
@@ -165,6 +166,22 @@ body {
   font-size: 20px; letter-spacing: normal; text-align: left;
 }
 
+.read-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.read-panel h2 {
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+.read-panel p:not(.card-label) {
+  color: var(--sub);
+  font-size: 16px;
+}
+
 /* ───────── 직접 고르기 ───────── */
 .pick-wrap { padding: 0; overflow: hidden; }
 .pick-toggle {
@@ -251,6 +268,24 @@ body {
 .chip-no { background: #fef2f2; color: #ef4444; box-shadow: inset 0 0 0 1px #fecaca; }
 .chip-space { width: 16px; }
 
+.read-result-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.recognized-text {
+  min-height: 120px;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 20px;
+  font-size: 28px;
+  line-height: 1.45;
+  font-weight: 800;
+}
+
 /* ───────── 기록 화면 ───────── */
 .history-body { padding: 32px 0; }
 .page-title { font-size: 28px; font-weight: 700; margin-bottom: 20px; }
@@ -274,4 +309,6 @@ body {
 @media (max-width: 560px) {
   .main-grid { grid-template-columns: 1fr; }
   .hero-title { font-size: 44px; }
+  .read-panel h2 { font-size: 24px; }
+  .recognized-text { font-size: 23px; }
 }

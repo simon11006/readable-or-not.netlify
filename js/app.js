@@ -6,7 +6,7 @@ const HISTORY_KEY = 'handwrite-history';
 
 // 현재 상태
 const state = {
-  contentType: 'sentence', // 'sentence' | 'paragraph'
+  contentType: 'sentence', // 'sentence' | 'paragraph' | 'read'
   difficulty: 'easy',      // 'easy' | 'medium' | 'hard' | 'all'
   picked: null,            // 홈에서 추천된 문장 객체
   currentText: '',         // 연습 중인 문장 텍스트
@@ -113,6 +113,14 @@ function renderHome() {
   document.querySelectorAll('[data-type]').forEach((btn) => {
     btn.classList.toggle('tab-active', btn.dataset.type === state.contentType);
   });
+  const isReadMode = state.contentType === 'read';
+  document.getElementById('challenge-panel').hidden = isReadMode;
+  document.getElementById('read-panel').hidden = !isReadMode;
+  document.getElementById('pick-wrap').hidden = isReadMode;
+  document.getElementById('btn-start-hero').textContent = isReadMode ? 'AI 판독 시작 →' : '도전 시작 →';
+
+  if (isReadMode) return;
+
   // 난이도
   document.querySelectorAll('[data-diff]').forEach((btn) => {
     btn.classList.toggle('level-active', btn.dataset.diff === state.difficulty);
@@ -153,12 +161,31 @@ function startPractice(text) {
   const isPara = text.includes('\n');
 
   document.getElementById('practice-kind').textContent = isPara ? '문단 도전' : '문장 도전';
+  document.getElementById('btn-print').hidden = false;
   const display = document.getElementById('practice-sentence');
   display.classList.toggle('para', isPara);
   display.innerHTML = text.split('\n')
     .map((line) => `<p>${escapeHtml(line)}</p>`).join('');
   document.getElementById('practice-hint').textContent =
     isPara ? '위 문단을 종이에 또박또박 써주세요' : '위 문장을 종이에 크게 또박또박 써주세요';
+  document.getElementById('capture-title').textContent = '사진 업로드';
+
+  resetCapture();
+  showView('practice');
+}
+
+function startReadCheck() {
+  state.currentText = '';
+  state.imageBase64 = null;
+
+  document.getElementById('practice-kind').textContent = 'AI 판독';
+  document.getElementById('btn-print').hidden = true;
+  const display = document.getElementById('practice-sentence');
+  display.classList.remove('para');
+  display.innerHTML = '<p>자유롭게 쓴 손글씨를 찍어주세요</p>';
+  document.getElementById('practice-hint').textContent =
+    'AI가 사진 속 글씨를 어떻게 읽는지 그대로 확인합니다';
+  document.getElementById('capture-title').textContent = '판독할 사진';
 
   resetCapture();
   showView('practice');
@@ -167,6 +194,11 @@ function startPractice(text) {
 // ───── 결과 화면 ─────
 
 function renderResult(text, recognizedText) {
+  document.getElementById('score-card').hidden = false;
+  document.getElementById('chars-card').hidden = false;
+  document.getElementById('read-result-card').hidden = true;
+  document.getElementById('btn-result-retry').textContent = '다시 도전';
+
   const { results, score, correct, total } = compareTexts(text, recognizedText);
   saveHistory({ text, score, type: text.includes('\n') ? 'paragraph' : 'sentence' });
 
@@ -186,6 +218,18 @@ function renderResult(text, recognizedText) {
     return `<span class="${cls}">${escapeHtml(r.original)}</span>`;
   }).join('');
 
+  showView('result');
+}
+
+function renderReadResult(recognizedText, confidence) {
+  document.getElementById('score-card').hidden = true;
+  document.getElementById('chars-card').hidden = true;
+  document.getElementById('read-result-card').hidden = false;
+  document.getElementById('btn-result-retry').textContent = '다시 확인';
+  document.getElementById('result-recognized').textContent =
+    recognizedText || 'AI가 읽어낸 글자가 없습니다.';
+  document.getElementById('result-confidence').textContent =
+    confidence ? `판독 확신도: ${confidence}` : '';
   showView('result');
 }
 
@@ -287,12 +331,16 @@ async function analyze() {
       body: JSON.stringify({
         imageBase64: state.imageBase64,
         mimeType: state.mimeType,
-        targetSentence: state.currentText,
+        targetSentence: state.currentText || undefined,
       }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || '분석 실패');
-    renderResult(state.currentText, data.recognizedText);
+    if (state.currentText) {
+      renderResult(state.currentText, data.recognizedText);
+    } else {
+      renderReadResult(data.recognizedText, data.confidence);
+    }
   } catch (err) {
     document.getElementById('analyze-loading').hidden = true;
     document.getElementById('capture-preview').hidden = false;
@@ -337,8 +385,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // 추천 셔플
   document.getElementById('btn-shuffle').addEventListener('click', shufflePicked);
   // 도전 시작 (히어로 + 카드)
-  document.getElementById('btn-start-hero').addEventListener('click', () => state.picked && startPractice(state.picked.text));
+  document.getElementById('btn-start-hero').addEventListener('click', () => {
+    if (state.contentType === 'read') {
+      startReadCheck();
+      return;
+    }
+    if (state.picked) startPractice(state.picked.text);
+  });
   document.getElementById('btn-start-card').addEventListener('click', () => state.picked && startPractice(state.picked.text));
+  document.getElementById('btn-start-read').addEventListener('click', startReadCheck);
   // 직접 고르기 토글
   document.getElementById('btn-toggle-list').addEventListener('click', () => {
     document.getElementById('pick-panel').hidden = !document.getElementById('pick-panel').hidden;
@@ -373,8 +428,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-analyze').addEventListener('click', analyze);
 
   // 결과 화면 버튼
-  document.getElementById('btn-result-retry').addEventListener('click', () => startPractice(state.currentText));
-  document.getElementById('btn-result-home').addEventListener('click', () => { renderHome(); showView('home'); });
+  document.getElementById('btn-result-retry').addEventListener('click', () => {
+    if (state.currentText) startPractice(state.currentText);
+    else startReadCheck();
+  });
+  const goHome = () => { renderHome(); showView('home'); };
+  document.getElementById('btn-result-home').addEventListener('click', goHome);
+  document.getElementById('btn-result-home-bottom').addEventListener('click', goHome);
 
   // 기록 화면 버튼
   document.getElementById('btn-history-home').addEventListener('click', () => { renderHome(); showView('home'); });

@@ -33,10 +33,11 @@
       <div class="tabs">
         <button class="tab tab-active" data-type="sentence">문장</button>
         <button class="tab" data-type="paragraph">문단</button>
+        <button class="tab" data-type="read">AI 판독</button>
       </div>
 
       <!-- 난이도 + 추천 문장 -->
-      <div class="main-grid">
+      <div id="challenge-panel" class="main-grid">
         <div class="card level-card">
           <p class="card-label">난이도</p>
           <div class="levels">
@@ -57,8 +58,15 @@
         </div>
       </div>
 
+      <div id="read-panel" class="card read-panel" hidden>
+        <p class="card-label">AI 판독</p>
+        <h2>내가 쓴 글씨를 AI가 어떻게 읽는지 확인해보세요</h2>
+        <p>제시문 없이 자유롭게 쓴 손글씨를 찍거나 업로드하면, AI가 읽은 문장을 그대로 보여줍니다.</p>
+        <button id="btn-start-read" class="btn-primary btn-block">사진으로 확인하기</button>
+      </div>
+
       <!-- 직접 고르기 -->
-      <div class="card pick-wrap">
+      <div id="pick-wrap" class="card pick-wrap">
         <button id="btn-toggle-list" class="pick-toggle">
           <span>직접 고르기</span>
           <span class="chevron">⌄</span>
@@ -92,7 +100,7 @@
         </div>
         <p id="practice-hint" class="center-hint"></p>
 
-        <div class="divider"><span>사진 업로드</span></div>
+        <div class="divider"><span id="capture-title">사진 업로드</span></div>
 
         <!-- 촬영/업로드 -->
         <div id="capture-idle" class="capture">
@@ -142,7 +150,7 @@
       </nav>
 
       <div class="result-body">
-        <div class="card score-card">
+        <div id="score-card" class="card score-card">
           <div id="result-emoji" class="result-emoji">🏆</div>
           <div class="score-num"><span id="result-score">0</span><small>점</small></div>
           <p id="result-message" class="score-msg"></p>
@@ -153,13 +161,19 @@
           </div>
         </div>
 
-        <div class="card">
+        <div id="read-result-card" class="card read-result-card" hidden>
+          <p class="card-label">AI가 읽은 글</p>
+          <div id="result-recognized" class="recognized-text"></div>
+          <p id="result-confidence" class="center-hint small"></p>
+        </div>
+
+        <div id="chars-card" class="card">
           <p class="card-label">글자별 채점</p>
           <div id="result-chars" class="chars"></div>
         </div>
 
         <div class="btn-row">
-          <button id="btn-result-home" class="btn-outline btn-half">홈으로</button>
+          <button id="btn-result-home-bottom" class="btn-outline btn-half">홈으로</button>
           <button id="btn-result-retry" class="btn-primary btn-half">다시 도전</button>
         </div>
       </div>

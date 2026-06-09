@@ -38,9 +38,9 @@ exports.handler = async (event) => {
     return json(400, { error: '요청 형식이 올바르지 않습니다.' });
   }
 
-  const { imageBase64, mimeType, targetSentence } = body;
-  if (!imageBase64 || !targetSentence) {
-    return json(400, { error: '이미지와 대상 문장이 필요합니다.' });
+  const { imageBase64, mimeType } = body;
+  if (!imageBase64) {
+    return json(400, { error: '이미지가 필요합니다.' });
   }
 
   try {
