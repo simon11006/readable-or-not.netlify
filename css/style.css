@@ -160,8 +160,8 @@ body {
 .icon-btn:hover { background: var(--bg); color: var(--text); }
 .picked-text {
   flex: 1; display: flex; align-items: center; justify-content: center;
-  text-align: center; font-size: 36px; font-weight: 700;
-  letter-spacing: .08em; padding: 16px 0; min-height: 90px;
+  text-align: center; font-size: 32px; font-weight: 700;
+  letter-spacing: .06em; padding: 14px 0; min-height: 82px;
   white-space: pre-line;
 }
 .picked-text.picked-paragraph {
@@ -217,7 +217,7 @@ body {
 .practice-title { text-align: center; }
 .practice-title h2 { font-size: 30px; font-weight: 700; margin-top: 4px; }
 .practice-sentence { text-align: center; }
-.practice-sentence p { font-size: 36px; font-weight: 700; letter-spacing: .1em; padding: 8px 0; }
+.practice-sentence p { font-size: 32px; font-weight: 700; letter-spacing: .06em; padding: 8px 0; }
 .practice-sentence.para { text-align: left; }
 .practice-sentence.para p { font-size: 24px; letter-spacing: .03em; }
 .center-hint { text-align: center; color: var(--sub); font-size: 16px; font-weight: 500; }
@@ -394,10 +394,10 @@ body {
     letter-spacing: .04em;
   }
   .picked-text {
-    font-size: 30px;
+    font-size: 26px;
     min-height: 54px;
     padding: 6px 0;
-    letter-spacing: .04em;
+    letter-spacing: .03em;
   }
   .picked-text.picked-paragraph {
     font-size: 17px;
