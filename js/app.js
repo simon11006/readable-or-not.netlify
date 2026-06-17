@@ -230,7 +230,7 @@ function renderResult(text, recognizedText, clarity) {
     const cls = r.status === 'ok' ? 'chip chip-ok'
       : r.status === 'messy' ? 'chip chip-messy'
       : 'chip chip-no';
-    const sub = r.status === 'messy' ? '흐림' : (r.recognized || '–');
+    const sub = r.status === 'messy' ? '부정확' : (r.recognized || '–');
     return `
       <span class="${cls}">
         <span class="chip-original">${escapeHtml(r.original)}</span>
