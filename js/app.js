@@ -542,6 +542,29 @@ function cancelCrop() {
 
 // ───── 분석 요청 ─────
 
+// 사진이 너무 크면 서버 처리 시간이 길어져 타임아웃이 날 수 있으므로,
+// 분석 전에 긴 변의 길이를 제한해 적당한 크기로 줄여서 보냅니다.
+function getScaledImageData(maxDim = 1600, quality = 0.85) {
+  return new Promise((resolve) => {
+    const fallback = { base64: state.imageBase64, mimeType: state.mimeType };
+    const img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth, h = img.naturalHeight;
+      const scale = Math.min(1, maxDim / Math.max(w, h));
+      if (scale >= 1) { resolve(fallback); return; }
+      const cw = Math.round(w * scale), ch = Math.round(h * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = cw;
+      canvas.height = ch;
+      canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+      const dataUrl = canvas.toDataURL('image/jpeg', quality);
+      resolve({ base64: dataUrl.split(',')[1], mimeType: 'image/jpeg' });
+    };
+    img.onerror = () => resolve(fallback);
+    img.src = document.getElementById('preview-img').src;
+  });
+}
+
 async function analyze() {
   if (!state.imageBase64) return;
   document.getElementById('capture-preview').hidden = true;
@@ -549,15 +572,23 @@ async function analyze() {
   document.getElementById('practice-error').hidden = true;
 
   try {
+    const { base64, mimeType } = await getScaledImageData();
     const res = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        imageBase64: state.imageBase64,
-        mimeType: state.mimeType,
+        imageBase64: base64,
+        mimeType,
       }),
     });
-    const data = await res.json();
+    // 서버가 JSON이 아닌 HTML 오류 페이지(타임아웃 등)를 보낼 수 있으므로 안전하게 파싱
+    const raw = await res.text();
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      throw new Error('AI 응답을 받지 못했어요. 사진이 너무 크거나 일시적인 오류일 수 있어요. 사진을 자르거나 잠시 후 다시 시도해주세요.');
+    }
     if (!res.ok) throw new Error(data.error || '분석 실패');
     if (state.currentText) {
       renderResult(state.currentText, data.recognizedText, data.clarity);
