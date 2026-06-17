@@ -651,6 +651,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const handle = e.target.closest('.crop-handle');
     startCropDrag(e, handle ? handle.dataset.handle : null);
   });
+  // 자르기 영역을 조정하는 동안 페이지가 위아래로 스크롤되지 않도록 막기
+  document.addEventListener('touchmove', (e) => {
+    if (cropDrag) e.preventDefault();
+  }, { passive: false });
   document.getElementById('btn-crop-cancel').addEventListener('click', cancelCrop);
   document.getElementById('btn-crop-apply').addEventListener('click', applyCrop);
 
