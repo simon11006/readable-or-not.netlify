@@ -51,7 +51,7 @@ function compareTexts(original, recognized) {
     } else if (j > 0 && (i === 0 || (dp[i][j - 1] <= dp[i - 1][j] && dp[i][j - 1] <= dp[i - 1][j - 1]))) {
       j--;
     } else if (i > 0 && (j === 0 || (dp[i - 1][j] <= dp[i][j - 1] && dp[i - 1][j] <= dp[i - 1][j - 1]))) {
-      alignment.unshift({ orig: origLetters[i - 1], recog: '?' });
+      alignment.unshift({ orig: origLetters[i - 1], recog: '–' });
       i--;
     } else {
       alignment.unshift({ orig: origLetters[i - 1], recog: recogLetters[j - 1] });
@@ -65,7 +65,7 @@ function compareTexts(original, recognized) {
     if (ch === ' ') {
       results.push({ original: ' ', recognized: ' ', isCorrect: true });
     } else {
-      const item = alignment[idx] || { orig: ch, recog: '?' };
+      const item = alignment[idx] || { orig: ch, recog: '–' };
       results.push({ original: item.orig, recognized: item.recog, isCorrect: item.orig === item.recog });
       idx++;
     }
@@ -221,7 +221,7 @@ function renderResult(text, recognizedText) {
     return `
       <span class="${cls}">
         <span class="chip-original">${escapeHtml(r.original)}</span>
-        <span class="chip-recognized">${escapeHtml(r.recognized || '?')}</span>
+        <span class="chip-recognized">${escapeHtml(r.recognized || '–')}</span>
       </span>`;
   }).join('');
 
