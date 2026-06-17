@@ -357,6 +357,11 @@ body {
   color: #ef4444;
   box-shadow: inset 0 0 0 1px #fecaca;
 }
+.chip-messy {
+  background: #fffbeb;
+  color: #d97706;
+  box-shadow: inset 0 0 0 1px #fde68a;
+}
 .chip-original {
   color: var(--text);
   font-size: 22px;

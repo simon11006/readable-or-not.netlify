@@ -35,10 +35,17 @@ function levenshtein(a, b) {
   return dp;
 }
 
-function compareTexts(original, recognized) {
+function compareTexts(original, recognized, clarity = []) {
   const origChars = Array.from(normalize(original));
   const origLetters = origChars.filter((c) => c !== ' ');
-  const recogLetters = Array.from(normalize(recognized)).filter((c) => c !== ' ');
+
+  // 인식된 글자와 또렷함(clear) 여부를 짝지어 두고, 공백은 제외
+  const recogPairs = [];
+  Array.from(recognized || '').forEach((ch, k) => {
+    if (/\s/.test(ch)) return;
+    recogPairs.push({ ch, clear: clarity[k] !== false });
+  });
+  const recogLetters = recogPairs.map((p) => p.ch);
 
   const dp = levenshtein(origLetters.join(''), recogLetters.join(''));
   const alignment = [];
@@ -46,15 +53,15 @@ function compareTexts(original, recognized) {
 
   while (i > 0 || j > 0) {
     if (i > 0 && j > 0 && origLetters[i - 1] === recogLetters[j - 1]) {
-      alignment.unshift({ orig: origLetters[i - 1], recog: recogLetters[j - 1] });
+      alignment.unshift({ orig: origLetters[i - 1], recog: recogLetters[j - 1], clear: recogPairs[j - 1].clear });
       i--; j--;
     } else if (j > 0 && (i === 0 || (dp[i][j - 1] <= dp[i - 1][j] && dp[i][j - 1] <= dp[i - 1][j - 1]))) {
       j--;
     } else if (i > 0 && (j === 0 || (dp[i - 1][j] <= dp[i][j - 1] && dp[i - 1][j] <= dp[i - 1][j - 1]))) {
-      alignment.unshift({ orig: origLetters[i - 1], recog: '–' });
+      alignment.unshift({ orig: origLetters[i - 1], recog: '–', clear: true });
       i--;
     } else {
-      alignment.unshift({ orig: origLetters[i - 1], recog: recogLetters[j - 1] });
+      alignment.unshift({ orig: origLetters[i - 1], recog: recogLetters[j - 1], clear: recogPairs[j - 1].clear });
       i--; j--;
     }
   }
@@ -63,10 +70,13 @@ function compareTexts(original, recognized) {
   let idx = 0;
   for (const ch of origChars) {
     if (ch === ' ') {
-      results.push({ original: ' ', recognized: ' ', isCorrect: true });
+      results.push({ original: ' ', recognized: ' ', isCorrect: true, status: 'space' });
     } else {
-      const item = alignment[idx] || { orig: ch, recog: '–' };
-      results.push({ original: item.orig, recognized: item.recog, isCorrect: item.orig === item.recog });
+      const item = alignment[idx] || { orig: ch, recog: '–', clear: true };
+      const matched = item.orig === item.recog;
+      // 글자가 맞아도 또렷하지 않으면(흐림) 정답으로 인정하지 않음
+      const status = matched ? (item.clear ? 'ok' : 'messy') : 'wrong';
+      results.push({ original: item.orig, recognized: item.recog, isCorrect: status === 'ok', status });
       idx++;
     }
   }
@@ -196,13 +206,13 @@ function startReadCheck() {
 
 // ───── 결과 화면 ─────
 
-function renderResult(text, recognizedText) {
+function renderResult(text, recognizedText, clarity) {
   document.getElementById('score-card').hidden = false;
   document.getElementById('chars-card').hidden = false;
   document.getElementById('read-result-card').hidden = true;
   document.getElementById('btn-result-retry').textContent = '다시 도전';
 
-  const { results, score, correct, total } = compareTexts(text, recognizedText);
+  const { results, score, correct, total } = compareTexts(text, recognizedText, clarity);
   saveHistory({ text, score, type: text.includes('\n') ? 'paragraph' : 'sentence' });
 
   const { msg, emoji } = scoreMessage(score);
@@ -217,11 +227,14 @@ function renderResult(text, recognizedText) {
   const chips = document.getElementById('result-chars');
   chips.innerHTML = results.map((r) => {
     if (r.original === ' ') return '<span class="chip-space"></span>';
-    const cls = r.isCorrect ? 'chip chip-ok' : 'chip chip-no';
+    const cls = r.status === 'ok' ? 'chip chip-ok'
+      : r.status === 'messy' ? 'chip chip-messy'
+      : 'chip chip-no';
+    const sub = r.status === 'messy' ? '흐림' : (r.recognized || '–');
     return `
       <span class="${cls}">
         <span class="chip-original">${escapeHtml(r.original)}</span>
-        <span class="chip-recognized">${escapeHtml(r.recognized || '–')}</span>
+        <span class="chip-recognized">${escapeHtml(sub)}</span>
       </span>`;
   }).join('');
 
@@ -547,7 +560,7 @@ async function analyze() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || '분석 실패');
     if (state.currentText) {
-      renderResult(state.currentText, data.recognizedText);
+      renderResult(state.currentText, data.recognizedText, data.clarity);
     } else {
       renderReadResult(data.recognizedText, data.confidence);
     }

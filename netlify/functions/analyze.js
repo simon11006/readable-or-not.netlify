@@ -14,6 +14,11 @@ const PROMPT = `이 이미지에 손으로 쓴 글씨가 있습니다.
 2. 절대 너그럽게 읽지 마세요. 글자가 의도한 글자처럼 "보일 것 같다"는 이유로 맞다고 읽으면 안 됩니다.
    오직 화면에 그려진 획의 실제 모양만 보고 판단하세요.
 
+글자 하나하나마다 두 가지를 판단해서 알려주세요:
+- char: 그 칸에 그려진 획 모양에 가장 가까운 한글 글자 하나 ('?' 절대 금지)
+- clear: 그 글자를 또렷하고 정확하게 잘 썼으면 true, 삐뚤거나 흐리거나 모양이 어긋나거나
+  어떤 글자인지 헷갈려서 추측이 필요했으면 false. 조금이라도 애매하면 엄격하게 false 로 하세요.
+
 판독 기준 (엄격하게 적용):
 - 문맥, 흔한 단어, 맞춤법으로 글자를 절대 보정하지 마세요. 틀리게 쓰인 글자는 틀린 그대로 읽어야 합니다.
 - 받침이 빠졌으면 받침 없이, 받침이 잘못됐으면 잘못된 받침 그대로 읽으세요.
@@ -22,12 +27,12 @@ const PROMPT = `이 이미지에 손으로 쓴 글씨가 있습니다.
 - 글씨가 삐뚤거나 서툴면, 의도를 추측하지 말고 실제 모양에 가장 가까운 글자로만 읽으세요.
 - 글씨가 겹치거나 이어진 경우 각 글자를 분리해서 읽으세요.
 - 이미지에 없는 내용을 새로 만들어내지 마세요.
+- 띄어쓰기(공백)는 char 를 " " 로, clear 를 true 로 하세요.
 
 반드시 아래 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
 {
-  "recognized_text": "보이는 획 모양 그대로 읽은 텍스트 ('?' 절대 사용 금지, 모든 글자를 한글로)",
-  "confidence": "high 또는 medium 또는 low",
-  "unclear_parts": ["읽기 어려웠던 부분 설명"]
+  "characters": [ {"char": "글", "clear": true}, {"char": "씨", "clear": false} ],
+  "confidence": "high 또는 medium 또는 low"
 }`;
 
 exports.handler = async (event) => {
@@ -90,10 +95,30 @@ exports.handler = async (event) => {
     }
 
     const parsed = JSON.parse(match[0]);
+
+    // 글자별 char/clear 배열을 텍스트와 또렷함(clarity) 배열로 변환
+    let recognizedText = '';
+    const clarity = [];
+    if (Array.isArray(parsed.characters)) {
+      for (const c of parsed.characters) {
+        const ch = typeof c?.char === 'string' ? c.char : '';
+        if (!ch) continue;
+        const isClear = c.clear !== false;
+        for (const unit of Array.from(ch)) {
+          recognizedText += unit;
+          clarity.push(isClear);
+        }
+      }
+    } else if (typeof parsed.recognized_text === 'string') {
+      // 옛 형식 호환
+      recognizedText = parsed.recognized_text;
+      for (const _ of Array.from(recognizedText)) clarity.push(true);
+    }
+
     return json(200, {
-      recognizedText: parsed.recognized_text || '',
+      recognizedText,
+      clarity,
       confidence: parsed.confidence || 'low',
-      unclearParts: parsed.unclear_parts || [],
     });
   } catch (err) {
     return json(500, { error: '분석 중 오류가 발생했습니다.' });
