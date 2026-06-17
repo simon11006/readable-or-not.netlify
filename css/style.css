@@ -265,6 +265,7 @@ body {
   border-radius: 12px;
   font-size: 14px;
 }
+.rotate-btn span { display: inline; }
 
 /* ───────── 자르기 ───────── */
 .crop-stage {
@@ -575,12 +576,18 @@ body {
     border-radius: 14px;
   }
   .rotate-row {
-    gap: 8px;
+    gap: 6px;
+    flex-wrap: nowrap;
   }
   .rotate-btn {
-    flex: 1 1 30%;
-    padding: 10px 8px;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 8px 4px;
     font-size: 12px;
+    line-height: 1.2;
+  }
+  .rotate-btn span {
+    display: block;
   }
   .result-body {
     padding: 16px 0;
