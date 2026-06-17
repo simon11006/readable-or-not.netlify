@@ -282,6 +282,7 @@ function resetCapture() {
   document.getElementById('capture-idle').hidden = false;
   document.getElementById('capture-webcam').hidden = true;
   document.getElementById('capture-preview').hidden = true;
+  document.getElementById('capture-crop').hidden = true;
   document.getElementById('analyze-loading').hidden = true;
   document.getElementById('practice-error').hidden = true;
   document.getElementById('camera-input').value = '';
@@ -417,6 +418,115 @@ function flipPreviewHorizontal() {
   img.src = document.getElementById('preview-img').src;
 }
 
+// ───── 사진 자르기 ─────
+
+let cropBox = null;        // { x, y, w, h } — 화면에 표시된 이미지 기준 px
+let cropDrag = null;       // 현재 드래그 상태
+
+function openCrop() {
+  if (!state.imageBase64) return;
+  const cropImg = document.getElementById('crop-img');
+  cropImg.onload = () => initCropBox();
+  cropImg.src = document.getElementById('preview-img').src;
+  document.getElementById('capture-preview').hidden = true;
+  document.getElementById('capture-crop').hidden = false;
+}
+
+function initCropBox() {
+  const img = document.getElementById('crop-img');
+  const w = img.clientWidth, h = img.clientHeight;
+  // 기본값: 가운데 80% 영역
+  cropBox = { x: w * 0.1, y: h * 0.1, w: w * 0.8, h: h * 0.8 };
+  renderCropBox();
+}
+
+function renderCropBox() {
+  const box = document.getElementById('crop-box');
+  box.style.left = cropBox.x + 'px';
+  box.style.top = cropBox.y + 'px';
+  box.style.width = cropBox.w + 'px';
+  box.style.height = cropBox.h + 'px';
+}
+
+function cropBounds() {
+  const img = document.getElementById('crop-img');
+  return { w: img.clientWidth, h: img.clientHeight };
+}
+
+function startCropDrag(e, handle) {
+  e.preventDefault();
+  const stage = document.getElementById('crop-stage');
+  const rect = stage.getBoundingClientRect();
+  cropDrag = {
+    handle,                       // null = 이동, 'nw'/'ne'/'sw'/'se' = 크기 조절
+    px: e.clientX - rect.left,
+    py: e.clientY - rect.top,
+    start: { ...cropBox },
+  };
+  document.getElementById('crop-stage').setPointerCapture?.(e.pointerId);
+  window.addEventListener('pointermove', moveCropDrag);
+  window.addEventListener('pointerup', endCropDrag);
+}
+
+function moveCropDrag(e) {
+  if (!cropDrag) return;
+  const stage = document.getElementById('crop-stage');
+  const rect = stage.getBoundingClientRect();
+  const { w: bw, h: bh } = cropBounds();
+  const cx = Math.max(0, Math.min(bw, e.clientX - rect.left));
+  const cy = Math.max(0, Math.min(bh, e.clientY - rect.top));
+  const dx = cx - cropDrag.px;
+  const dy = cy - cropDrag.py;
+  const s = cropDrag.start;
+  const MIN = 30;
+
+  if (!cropDrag.handle) {
+    // 이동
+    cropBox.x = Math.max(0, Math.min(bw - s.w, s.x + dx));
+    cropBox.y = Math.max(0, Math.min(bh - s.h, s.y + dy));
+  } else {
+    let left = s.x, top = s.y, right = s.x + s.w, bottom = s.y + s.h;
+    if (cropDrag.handle.includes('w')) left = Math.min(right - MIN, Math.max(0, s.x + dx));
+    if (cropDrag.handle.includes('e')) right = Math.max(left + MIN, Math.min(bw, s.x + s.w + dx));
+    if (cropDrag.handle.includes('n')) top = Math.min(bottom - MIN, Math.max(0, s.y + dy));
+    if (cropDrag.handle.includes('s')) bottom = Math.max(top + MIN, Math.min(bh, s.y + s.h + dy));
+    cropBox = { x: left, y: top, w: right - left, h: bottom - top };
+  }
+  renderCropBox();
+}
+
+function endCropDrag() {
+  cropDrag = null;
+  window.removeEventListener('pointermove', moveCropDrag);
+  window.removeEventListener('pointerup', endCropDrag);
+}
+
+function applyCrop() {
+  if (!cropBox) return;
+  const img = document.getElementById('crop-img');
+  const scaleX = img.naturalWidth / img.clientWidth;
+  const scaleY = img.naturalHeight / img.clientHeight;
+  const sx = Math.round(cropBox.x * scaleX);
+  const sy = Math.round(cropBox.y * scaleY);
+  const sw = Math.round(cropBox.w * scaleX);
+  const sh = Math.round(cropBox.h * scaleY);
+  if (sw < 1 || sh < 1) { cancelCrop(); return; }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = sw;
+  canvas.height = sh;
+  canvas.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+
+  const outputMime = state.mimeType === 'image/png' ? 'image/png' : 'image/jpeg';
+  document.getElementById('capture-crop').hidden = true;
+  showPreview(canvas.toDataURL(outputMime, 0.92), outputMime);
+}
+
+function cancelCrop() {
+  document.getElementById('capture-crop').hidden = true;
+  document.getElementById('capture-preview').hidden = false;
+}
+
 // ───── 분석 요청 ─────
 
 async function analyze() {
@@ -532,8 +642,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-rotate-left').addEventListener('click', () => rotatePreview(-90));
   document.getElementById('btn-flip-horizontal').addEventListener('click', flipPreviewHorizontal);
   document.getElementById('btn-rotate-right').addEventListener('click', () => rotatePreview(90));
+  document.getElementById('btn-crop').addEventListener('click', openCrop);
   document.getElementById('btn-retake').addEventListener('click', resetCapture);
   document.getElementById('btn-analyze').addEventListener('click', analyze);
+
+  // 자르기 상호작용
+  document.getElementById('crop-box').addEventListener('pointerdown', (e) => {
+    const handle = e.target.closest('.crop-handle');
+    startCropDrag(e, handle ? handle.dataset.handle : null);
+  });
+  document.getElementById('btn-crop-cancel').addEventListener('click', cancelCrop);
+  document.getElementById('btn-crop-apply').addEventListener('click', applyCrop);
 
   // 결과 화면 버튼
   document.getElementById('btn-result-retry').addEventListener('click', () => {

@@ -126,14 +126,33 @@
 
         <div id="capture-preview" class="capture" hidden>
           <img id="preview-img" class="preview-img" alt="촬영된 손글씨" />
+          <p class="center-hint small">학습지 예시 글자가 같이 찍혔다면 <b>자르기</b>로 내가 쓴 부분만 남겨주세요</p>
           <div class="rotate-row">
             <button id="btn-rotate-left" class="btn-outline rotate-btn">왼쪽 회전</button>
+            <button id="btn-crop" class="btn-outline rotate-btn">자르기</button>
             <button id="btn-flip-horizontal" class="btn-outline rotate-btn">좌우 뒤집기</button>
             <button id="btn-rotate-right" class="btn-outline rotate-btn">오른쪽 회전</button>
           </div>
           <div class="btn-row">
             <button id="btn-retake" class="btn-outline btn-half">다시 찍기</button>
             <button id="btn-analyze" class="btn-primary btn-half">분석하기</button>
+          </div>
+        </div>
+
+        <div id="capture-crop" class="capture" hidden>
+          <p class="center-hint small">내가 쓴 글자만 남도록 모서리를 끌어 영역을 맞춰주세요</p>
+          <div id="crop-stage" class="crop-stage">
+            <img id="crop-img" class="crop-img" alt="자를 사진" />
+            <div id="crop-box" class="crop-box">
+              <span class="crop-handle crop-nw" data-handle="nw"></span>
+              <span class="crop-handle crop-ne" data-handle="ne"></span>
+              <span class="crop-handle crop-sw" data-handle="sw"></span>
+              <span class="crop-handle crop-se" data-handle="se"></span>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button id="btn-crop-cancel" class="btn-outline btn-half">취소</button>
+            <button id="btn-crop-apply" class="btn-primary btn-half">이 영역으로 자르기</button>
           </div>
         </div>
 
